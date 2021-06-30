@@ -76,6 +76,7 @@ def dist_model(src_model, node_info, remote_path="xt_archive"):
     if node_info[0] == server_ip:
         return None
 
+
     _basename = os.path.basename(src_model)
     if _basename in ("none", "None", None):  # init model with (none, none)
         return None

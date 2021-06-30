@@ -23,6 +23,7 @@ from __future__ import division, print_function
 
 import os
 import argparse
+import subprocess
 import sys
 import ast
 import socket
@@ -214,11 +215,14 @@ def bytes_to_str(data):
 
 def get_host_ip():
     """Get local ip address."""
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
+    p = subprocess.Popen("hostname -I", shell=True, stdout=subprocess.PIPE)
+    data = p.stdout.read()
+    data = str(data, encoding='UTF-8')
+    ip_list = data.split(" ")
+    if "\n" in ip_list:
+        ip_list.remove("\n")
 
-    return ip
+    for ip in ip_list:
+        if ip.find('10.') >= 0:
+            return ip
+    return ip_list[0]

@@ -28,6 +28,10 @@ import threading
 import platform
 from collections import deque
 from time import time
+import matplotlib
+
+matplotlib.use('Tkagg')
+import matplotlib.pyplot as plt
 
 import numpy as np
 import logging as normal_logging
@@ -35,6 +39,7 @@ from absl import logging
 from .profile_stats import LoopTracker, SingleTracker
 from .local_data import LocalDataWriter
 from zeus.common.util.common import get_host_ip
+
 LOG_DEFAULT_PATH = os.path.join(os.path.expanduser("~"), "xt_archive")
 
 
@@ -90,6 +95,7 @@ BOARD_GROUP_MAP = {
     # "eval_criteria": "benchmark",
 }
 
+
 # pylint: disable=C0330
 
 
@@ -105,7 +111,10 @@ class Logger(object):
             "step": [],
             "train_count": [],
             "train_loss": [],
+            "x_train_count": [],
+            "y_train_reward": []
         }
+        print("logger init===========================")
         self._workspace = workspace
         self.train_timer = LoopTracker(20)
         self.wait_sample_timer = SingleTracker(20)
@@ -142,8 +151,8 @@ class Logger(object):
             "elapsed_time": self.elapsed_time,
         }
         for _key in (
-            "train_loss",
-            "train_count",
+                "train_loss",
+                "train_count",
         ):
             if self.records[_key]:
                 _info.update({_key: self.records[_key][-1]})
@@ -166,11 +175,24 @@ class Logger(object):
                 {"train_reward_avg": np.mean(self.records["train_reward"][-100:])}
             )
 
-        _extend_item = ("explore_won_rate", )
+            # print("===============train_count", self.records["train_count"][-1])
+            self.records["x_train_count"].append(self.records["train_count"][-1])
+            # print("===============x_train_count", self.records["x_train_count"])
+
+            # print("===============train_reward_avg:", np.mean(self.records["train_reward"][-100:]))
+            self.records["y_train_reward"].append(np.mean(self.records["train_reward"][-100:]))
+            # print("===============y_train_reward:",  self.records["y_train_reward"])
+            if self.records["train_count"][-1] > 50:
+                plt.plot(self.records["x_train_count"], self.records["y_train_reward"])
+                plt.savefig('images/plot3.png', format='png')
+
+        _extend_item = ("explore_won_rate",)
         for _item in _extend_item:
             if _item not in self.records.keys():
                 continue
             _info.update({_item: self.records[_item]})
+
+
 
         return _info
 
@@ -235,14 +257,14 @@ class StatsRecorder(threading.Thread):
     """
 
     def __init__(
-        self,
-        msg_deliver,
-        bm_args,
-        workspace,
-        bm_board=None,
-        show_interval=10000,
-        name="xt_stats",
-        explore_deque_len=30,
+            self,
+            msg_deliver,
+            bm_args,
+            workspace,
+            bm_board=None,
+            show_interval=10000,
+            name="xt_stats",
+            explore_deque_len=30,
     ):
         """Stats recorder inherit from threading.Thread, run with single thread."""
         threading.Thread.__init__(self, name=name)
@@ -324,12 +346,12 @@ class StatsRecorder(threading.Thread):
         """Display recent status."""
         # update explorer status firstly.
         for target_key in (
-            "mean_env_step_ms",
-            "mean_inference_ms",
-            "explore_ms",
-            "wait_model_ms",
-            "restore_model_ms",
-            "mean_explore_reward",
+                "mean_env_step_ms",
+                "mean_inference_ms",
+                "explore_ms",
+                "wait_model_ms",
+                "restore_model_ms",
+                "mean_explore_reward",
         ):
             if "mean_explore_reward" not in self.explore_stats:
                 # extend explore reward
@@ -366,6 +388,9 @@ class StatsRecorder(threading.Thread):
             _show_items += 1
             _str += "{:<24}{:>10}".format(_key + ":", round(float(val), 6))
             _str += "\n" if _show_items % row == 0 else "\t"
+
+            if _key == "train_reward_avg":
+                print(_key + ":", round(float(val), 6))
 
         show_str = _str + "\n" if not _str.endswith("\n") else _str
         logging.info(show_str)

@@ -403,6 +403,8 @@ class TrainWorker(object):
                 train_reward=np.sum(data_dict["reward"]),
                 train_count=self.train_count,
             )
+
+
             return
         elif self.alg.alg_config['api_type'] == "unified":
             self.actual_step += len(data_dict["done"])
@@ -411,6 +413,7 @@ class TrainWorker(object):
                 train_reward=np.sum(data_dict["reward"]),
                 train_count=self.train_count,
             )
+
             return
 
         data_length = len(data_dict["done"])  # fetch the train data length
