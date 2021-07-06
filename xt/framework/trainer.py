@@ -51,7 +51,7 @@ def start_multi_processes(alg_para, model_q, model_path, process_num, train_list
     alg = alg_builder(**alg_para)
     train_main_thread = threading.Thread(target=train_main,
                                          args=(alg, array_list, weight_list,
-                                               process_num, model_q, model_path, event_dict, grad_q))
+                                               process_num, model_q, model_path, evnet_dict, grad_q))
     train_main_thread.start()
 
     return alg, grad_process

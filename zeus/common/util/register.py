@@ -27,12 +27,14 @@ import sys
 import glob
 from collections import defaultdict
 from absl import logging
+
 # logging.set_verbosity(logging.DEBUG)
 try:
     import xt
 except ModuleNotFoundError:
     xt = None
 from zeus import set_backend
+
 set_backend(backend='tensorflow', device_category='GPU')
 
 
@@ -57,6 +59,7 @@ class RegisterStub(object):  # pylint: disable=too-few-public-methods
 
     def __call__(self, param):
         """Call function."""
+        # register function
         if not callable(param):
             raise Exception("To Registry must be callable, Got: {}.".format(param))
 

@@ -3,6 +3,8 @@ import shlex
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+from multiprocessing.sharedctypes import RawArray
+from functools import wraps
 
 cpu_utl = []
 
@@ -46,5 +48,40 @@ def command(times):
     plt.show()
 
 
+def test_lambda(a):
+    x = np.arange(0, 10, 0.01)
+    y = 1 + x ** 2
+    plt.plot(x, y)
+    plt.show()
+
+
+class A:
+    def __init__(self):
+        self.dict = dict()
+
+    def __getitem__(self, item):
+        return self.dict[item]
+
+    def __call__(self, param):
+        print("a.call")
+        register_name = param.__name__
+        print(register_name)
+        self.dict[register_name] = param
+        return param
+
+
+a = A()
+
+
+@a
+class B:
+    def print_b(self):
+        print("b")
+
+
 if __name__ == "__main__":
-    command(100)
+    b = B()
+    b.print_b()
+    c = a["B"]()
+    c.print_b()
+
