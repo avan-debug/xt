@@ -80,8 +80,6 @@ class B:
 
 
 if __name__ == "__main__":
-    b = B()
-    b.print_b()
-    c = a["B"]()
-    c.print_b()
+    top()
+    print(cpu_utl)
 

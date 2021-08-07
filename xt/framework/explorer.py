@@ -117,6 +117,7 @@ class Explorer(object):
         """Send train data to learner."""
         while True:
             data = self.recv_agent.recv()
+            # cmd 默认就是训练
             info_cmd = get_msg_info(data, "cmd")
 
             new_cmd = info_cmd + self.learner_postfix

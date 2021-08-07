@@ -44,7 +44,7 @@ speedup: False
 benchmark:
   log_interval_to_train: 20
   eval:
-    # model_path: /YOUR/PATH/TO/EVAL/models
+    model_path: /xt_archive/model_data/cartpole_0
     gap: 100
     model_divided_freq: 1   # how many times to divided of each model
     episodes_per_eval: 1

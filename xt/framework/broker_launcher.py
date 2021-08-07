@@ -93,6 +93,7 @@ def launch_broker(config_info, verbosity="info"):
     server_port_info = broker_controller.port_info
 
     # port for broker client
+    # 接收训练端口， 发送给预测端口
     train_port = server_port_info["recv"]["port"]
     predict_port = list([_d["port"] for _d in server_port_info["send"]])
 

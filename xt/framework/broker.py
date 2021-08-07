@@ -51,12 +51,15 @@ class Controller(object):
         self.node_config_list = node_config_list
         self.node_num = len(node_config_list)
 
+        # zmq通信bind
         self.recv_broker = UniComm("CommByZmq", type="PULL")
+        # zmq通信bind
         self.send_broker = [
             UniComm("CommByZmq", type="PUSH") for _i in range(self.node_num)
         ]
 
         self.port_info = {
+            # 字符串转换
             "recv": ast.literal_eval(self.recv_broker.info),
             "send": [ast.literal_eval(_s.info) for _s in self.send_broker]}
 
@@ -161,7 +164,7 @@ class Controller(object):
                 # print(self.send_local_q.keys())
                 self.send_local_q[cmd].send(recv_data)
                 # logging.debug("recv: {} with cmd-{}".format(
-                #     recv_data["data"], cmd))
+                # recv_data["data"], cmd))
             else:
                 _t1 = time.time()
                 broker_id = get_msg_info(recv_data, "broker_id")
@@ -278,6 +281,8 @@ class Broker(object):
 
     def __init__(self, ip_addr, broker_id, push_port, pull_port):
         self.broker_id = broker_id
+
+        # 开启zmq通信服务
         self.send_controller_q = UniComm(
             "CommByZmq", type="PUSH", addr=ip_addr, port=push_port
         )
@@ -303,6 +308,8 @@ class Broker(object):
         # Note: need check it if add explorer dynamic
         # buf size vary with env_num&algorithm
         # ~4M, impala atari model
+
+        # 开启plasma 共享内存服务
         self._buf = ShareBuf(live=0, size=400000000, max_keep=94, start=True)
 
     def start_data_transfer(self):
@@ -312,6 +319,7 @@ class Broker(object):
 
         data_transfer_thread = threading.Thread(target=self.recv_explorer)
         data_transfer_thread.start()
+
 
     def _setup_share_qs_firstly(self, config_info):
         """Setup only once time."""
@@ -344,7 +352,9 @@ class Broker(object):
         while True:
             # recv, data will deserialize with pyarrow default
             # recv_data = self.recv_controller_q.recv()
+            print("fuck 快进来")
             ctr_info, data = self.recv_controller_q.recv_bytes()
+            print("fuck 过头了")
             recv_data = {'ctr_info': deserialize(ctr_info), 'data': deserialize(data)}
 
             cmd = get_msg_info(recv_data, "cmd")
@@ -432,7 +442,7 @@ class Broker(object):
 
     def _step_explorer_msg(self, use_single_stub):
         """Yield local msg received."""
-
+        # use_single_stub是否开启plasma服务
         if use_single_stub:
             # whole explorer share single plasma
             recv_id = "T0"
@@ -461,11 +471,13 @@ class Broker(object):
 
     def recv_explorer(self):
         """Recv explorer cmd."""
+        print("recv_explorer============")
         while not self.recv_explorer_q_ready:
             # wait explorer share buffer ready
             time.sleep(0.05)
         # whole explorer share single plasma
         use_single_flag = True if len(self.explorer_share_qs) == 2 else False
+        print("self.explorer_share_qs: ", self.explorer_share_qs)
         yield_func = self._step_explorer_msg(use_single_flag)
 
         while True:

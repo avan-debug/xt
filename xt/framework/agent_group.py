@@ -396,7 +396,7 @@ class AgentGroup(object):
         feed_funcs = [agent.handel_predict_value for agent in self.agents]
         feed_inputs = list(zip(states, pred_vals))
 
-        batch_action =  self.bot.do_multi_job(feed_funcs, feed_inputs)
+        batch_action = self.bot.do_multi_job(feed_funcs, feed_inputs)
 
         # agent.id keep pace with the id within the environment.
         action_package = {_ag.id: v for _ag, v in zip(self.agents, batch_action)}

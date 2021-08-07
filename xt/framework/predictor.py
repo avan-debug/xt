@@ -67,6 +67,8 @@ class Predictor(object):
         self.alg.set_weights(model_weights)
 
     def predict(self, recv_data):
+        """receive data from broker and explorer and predict action by state
+        then send action to the broker and explorer"""
         start_t1 = time()
         state = get_msg_data(recv_data)
         broker_id = get_msg_info(recv_data, 'broker_id')

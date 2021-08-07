@@ -56,6 +56,7 @@ def _makeup_learner(config_info, data_url, verbosity):
     # fixme: split the relation between learner and tester
     _use_pbt, pbt_size, env_num, _pbt_config = get_pbt_set(config_info)
 
+    # 超参数自动优化方法 pbt
     if _use_pbt:
         metric_store = controller.register("pbt_metric", "store")
         weights_store = controller.register("pbt_weights", "store")
@@ -65,10 +66,15 @@ def _makeup_learner(config_info, data_url, verbosity):
     for _learner_id in range(pbt_size):
         learner = setup_learner(config_info, eval_adapter, _learner_id, data_url)
 
+        # 更新send_local_q （predictT0）=learner.send_predict 为 plasma客户端
         controller.register("predict{}".format(learner.name), "send", learner.send_predict)
+        #更新send_local_q （trainT0）=learner.send_train 为 queue.Queue
         learner.send_train = controller.register("train{}".format(learner.name), "send")
+        # localMessage queue.Queue (stats_msg) = learner.stats_deliver
         learner.stats_deliver = controller.register("stats_msg{}".format(learner.name), "send")
+        # localMessage queue.Queue recvT0=learner.send_broker
         learner.send_broker = controller.register("recv{}".format(learner.name), "recv")
+        # 更新send_local_q （recv_predictT0）=learner.send_broker_predict 为 multiprocessing.Queue客户端
         controller.register("recv_predict{}".format(learner.name), "recv", learner.send_broker_predict)
 
         # update the learner <--relationship--> explorer ids

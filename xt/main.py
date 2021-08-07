@@ -26,6 +26,8 @@ Usage:
 
 import argparse
 import pprint
+import time
+
 import yaml
 # import matplotlib
 # matplotlib.use('Tkagg')
@@ -121,5 +123,7 @@ if __name__ == "__main__":
     # plt.ylabel("y axis caption")
     # plt.plot(x, y)
     # plt.savefig('images/plot1.png', format='png')
-    print("aa")
+    start = time.time()
     main()
+    end = time.time()
+    print(start - end)

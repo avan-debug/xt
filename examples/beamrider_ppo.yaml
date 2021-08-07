@@ -42,4 +42,6 @@ remote_env:
   conda: /home/user_test/anaconda2/envs/xt_qmix
 
 benchmark:
+  id: xt_cartpole
+  archive_root: ./xt_archive
   log_interval_to_train: 10

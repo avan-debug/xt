@@ -33,8 +33,11 @@ model_para:
       activation: relu
       hidden_sizes: [256]
 
-env_num: 10
+env_num: 40
 speedup: False
-
+node_config: [["10.0.1.2", "root", "tanklab"], ["10.0.1.5", "root", "tanklab"]] #172.17.0.5 192.168.1.137:10022
+#test_node_config: [["172.17.0.5", "root", "tanklab"]]
+remote_env:
+  conda: /home/user_test/anaconda2/envs/xt_qmix
 benchmark:
   log_interval_to_train: 10
